@@ -31,6 +31,8 @@ import com.github.f4b6a3.uuid.codec.UuidCodec;
 import com.github.f4b6a3.uuid.codec.base.Base32Codec;
 import com.github.f4b6a3.uuid.codec.base.Base64UrlCodec;
 import com.github.f4b6a3.uuid.codec.base.BaseNCodec;
+import com.github.f4b6a3.uuid.exception.InvalidUuidException;
+import com.github.f4b6a3.uuid.util.UuidValidator;
 import com.github.f4b6a3.uuid.util.immutable.CharArray;
 import com.github.f4b6a3.uuid.util.immutable.LongArray;
 
@@ -145,11 +147,21 @@ public final class NcnameCodec implements UuidCodec<String> {
 			break;
 		default:
 			this.shift = 0; // unspecified
+			break;
 		}
 	}
 
+	/**
+	 * Get a NCName from a UUID.
+	 * 
+	 * @param uuid a UUID
+	 * @return a NCName
+	 * @throws InvalidUuidException if the argument is invalid
+	 */
 	@Override
-	public String encode(final UUID uuid) {
+	public String encode(UUID uuid) {
+
+		UuidValidator.validate(uuid);
 
 		int version = uuid.version();
 		byte[] bytes = BinaryCodec.INSTANCE.encode(uuid);
@@ -173,17 +185,34 @@ public final class NcnameCodec implements UuidCodec<String> {
 		return v + encoded;
 	}
 
+	/**
+	 * Get a UUID from a NCName.
+	 * 
+	 * @param ncname a NCName
+	 * @return a UUID
+	 * @throws InvalidUuidException if the argument is invalid
+	 */
 	@Override
 	public UUID decode(String ncname) {
 
-		int version = (int) VERSION_MAP.get(ncname.charAt(0));
+		if (ncname == null || ncname.length() != this.length) {
+			throw new InvalidUuidException("Invalid UUID NCName: \"" + ncname + "\"");
+		}
+
+		// check if the bookends are valid chars: [A-Pa-p]
+		int bookend1 = (int) VERSION_MAP.get(ncname.charAt(0));
+		int bookend2 = (int) VERSION_MAP.get(ncname.charAt(ncname.length() - 1));
+		if (bookend1 == -1 || bookend2 == -1) {
+			throw new InvalidUuidException("Invalid UUID NCName: \"" + ncname + "\"");
+		}
+
+		int version = bookend1 & 0xf;
+
 		String substring = ncname.substring(1, ncname.length());
 		UUID uuid = this.codec.decode(substring + padding);
 
 		byte[] bytes = BinaryCodec.INSTANCE.encode(uuid);
 		bytes[15] = (byte) ((bytes[15] & 0xff) << this.shift);
-
-		version &= 0xf;
 
 		int[] ints = toInts(bytes);
 
