@@ -1,5 +1,5 @@
 
-package benchmark;
+package com.github.f4b6a3.uuid.benchmark;
 
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
