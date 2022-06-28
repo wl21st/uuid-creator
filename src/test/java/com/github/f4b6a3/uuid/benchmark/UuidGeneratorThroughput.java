@@ -87,4 +87,15 @@ public class UuidGeneratorThroughput {
         blackhole.consume(uuid.toString());
     }
 
+    @Benchmark
+    public void uuid_creator_03_time_ordered_epoch1(Blackhole blackhole) {
+        blackhole.consume(UuidCreator.getTimeOrderedEpochPlus1());
+    }
+
+    @Benchmark
+    public void uuid_creator_04_time_ordered_epoch1_tostring(Blackhole blackhole) {
+        blackhole.consume(UuidCreator.getTimeOrderedEpochPlus1().toString());
+    }
+
+
 }
