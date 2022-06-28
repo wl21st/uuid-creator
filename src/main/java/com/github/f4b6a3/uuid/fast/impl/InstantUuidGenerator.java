@@ -15,33 +15,34 @@ import java.util.concurrent.locks.ReentrantLock;
  */
 public class InstantUuidGenerator implements IUuidGenerator {
 
-    private Instant lastInstant = Instant.now();
+  private Instant lastInstant = Instant.now();
 
-    private int sequence = 0;
+  private int sequence = 0;
 
-    private int uniqueId = new SplittableRandom().nextInt();
+  private int uniqueId = new SplittableRandom().nextInt();
 
-    private ReentrantLock lock = new ReentrantLock();
+  private ReentrantLock lock = new ReentrantLock();
 
-    @Override
-    public UUID generate() {
-        lock.lock();
-        try {
-            Instant now = Instant.now();
+  @Override
+  public UUID generate() {
+    lock.lock();
+    try {
+      Instant now = Instant.now();
 
-            // Check if we are in the exact time in ns precision
-            // Very rare and .
-            if (now.equals(lastInstant)) {
-                sequence++;
-            } else {
-                lastInstant = now;
-                sequence = 0;
-            }
+      // Check if we are in the exact time in ns precision
+      // Very rare and .
+      if (now.equals(lastInstant)) {
+        sequence++;
+      } else {
+        lastInstant = now;
+        sequence = 0;
+      }
 
-            return new UUID(now.getEpochSecond() << 20 | now.getNano() & 0xFFFFFF, sequence << 32 | uniqueId);
-        } finally {
-            lock.unlock();
-        }
+      return new UUID(now.getEpochSecond() << 30 | now.getNano() & 0x3FFFFFFF,
+          sequence << 32 | uniqueId);
+    } finally {
+      lock.unlock();
     }
+  }
 
 }
