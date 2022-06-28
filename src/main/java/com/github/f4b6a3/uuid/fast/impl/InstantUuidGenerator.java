@@ -4,6 +4,7 @@ import com.github.f4b6a3.uuid.fast.common.IUuidGenerator;
 
 import java.time.Instant;
 import java.util.SplittableRandom;
+import java.util.UUID;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
@@ -23,7 +24,7 @@ public class InstantUuidGenerator implements IUuidGenerator {
     private ReentrantLock lock = new ReentrantLock();
 
     @Override
-    public Uuid generate() {
+    public UUID generate() {
         lock.lock();
         try {
             Instant now = Instant.now();
@@ -37,7 +38,7 @@ public class InstantUuidGenerator implements IUuidGenerator {
                 sequence = 0;
             }
 
-            return new Uuid(now.getEpochSecond() << 20 | now.getNano() & 0xFFFFFF, sequence << 32 | uniqueId);
+            return new UUID(now.getEpochSecond() << 20 | now.getNano() & 0xFFFFFF, sequence << 32 | uniqueId);
         } finally {
             lock.unlock();
         }

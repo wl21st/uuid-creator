@@ -4,7 +4,6 @@ import com.github.f4b6a3.uuid.UuidCreator;
 import com.github.f4b6a3.uuid.fast.common.IUuidGenerator;
 import com.github.f4b6a3.uuid.fast.impl.InstantUuidGenerator;
 import com.github.f4b6a3.uuid.fast.impl.NanoUuidGenerator;
-import org.apache.commons.codec.binary.Hex;
 import org.junit.Test;
 
 import java.util.UUID;
@@ -20,31 +19,23 @@ public class IUuidGeneratorTest {
     }
 
     @Test
-    public void testInstantGeneratorByteValue() {
-        IUuidGenerator generator = new InstantUuidGenerator();
-
-        for (int i = 0; i < 10; i++) {
-            System.out.printf("%d=%s%n", i, Hex.encodeHex(generator.generate().bytesValue()));
-        }
-    }
-
-    @Test
-    public void testNanoGeneratorByteValue() {
+    public void testNanoTimeHexValue() {
         IUuidGenerator generator = new NanoUuidGenerator();
 
         for (int i = 0; i < 10; i++) {
-            System.out.printf("%d=%s%n", i, Hex.encodeHex(generator.generate().bytesValue()));
+            System.out.printf("%d=%s%n", i, generator.generate().toString());
         }
     }
 
     @Test
-    public void testNanoTimeHexValue() {
-        NanoUuidGenerator generator = new NanoUuidGenerator();
+    public void testInstantHexValue() {
+        IUuidGenerator generator = new InstantUuidGenerator();
 
         for (int i = 0; i < 10; i++) {
-            System.out.printf("%d=%s%n", i, generator.generate().hexValue());
+            System.out.printf("%d=%s%n", i, generator.generate().toString());
         }
     }
+
 
     @Test
     public void testNanoTimeGap() {
@@ -52,7 +43,7 @@ public class IUuidGeneratorTest {
         for (int i = 0; i < 10; i++) {
             long now = System.nanoTime();
 
-            System.out.printf("%d=%d(%,.6fms)%n", i, now, (now - last) / 1000000d);
+            System.out.printf("%d=%d(%,.6f ms)%n", i, now, (now - last) / 1000000d);
 
             last = now;
         }

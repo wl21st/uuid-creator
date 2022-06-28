@@ -5,6 +5,7 @@ import com.github.f4b6a3.uuid.fast.common.IUuidGenerator;
 
 import java.time.Instant;
 import java.util.SplittableRandom;
+import java.util.UUID;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
@@ -30,7 +31,7 @@ public class NanoUuidGenerator implements IUuidGenerator {
         this.uniqueId = new SplittableRandom().nextInt();
     }
 
-    public Uuid generate() {
+    public UUID generate() {
         lock.lock();
         try {
             long currentNanoTime = baseNanoTime + (System.nanoTime() - startNanoTime);
@@ -41,7 +42,7 @@ public class NanoUuidGenerator implements IUuidGenerator {
                 sequence = 0;
             }
 
-            Uuid result = new Uuid(currentNanoTime, sequence << 32 | uniqueId);
+            UUID result = new UUID(currentNanoTime, sequence << 32 | uniqueId);
 
             this.lastNanoTime = currentNanoTime;
 
